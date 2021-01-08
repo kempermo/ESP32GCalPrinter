@@ -1,21 +1,21 @@
 /*
- *  Copyright (C) 2021 kempermo
- *
- * 
- *  ESP32GCalPrinter is free software: you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation, either version 3 of the License, or
- *  (at your option) any later version.
- *
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- *
- *  You should have received a copy of the GNU General Public License
- *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
- 
+    Copyright (C) 2021 kempermo
+
+
+    ESP32GCalPrinter is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
 #include <WiFi.h>
 #include <WiFiClientSecure.h>
 #include "calEvent.h"
@@ -40,6 +40,10 @@ const char* script = "https://script.google.com/macros/s/A1B2C3D4/exec";
 const char* script = SCRIPT_URL;
 #endif
 
+// call the google script in defined timeframes
+unsigned long lastScriptCall = 0;
+unsigned long updateInterval = 1800000; // defined in milliseconds (e.g. 1000*seconds*minutes)
+
 void setup()
 {
   // start the serial connection
@@ -63,30 +67,38 @@ void setup()
   Serial.println("WiFi connected");
   Serial.println("IP address: ");
   Serial.println(WiFi.localIP());
+
+  // reset timer
+  lastScriptCall = millis() - updateInterval;
 }
 
 void loop()
 {
   if (WiFi.status() == WL_CONNECTED)
   {
-    String response = FetchGCal(script);
-    Serial.printf("Today's Calendar:\n%s\n", response.c_str());
-
-    //Extract current date
-    String date = getValue(response, '\n', 0);
-    date = date.substring(0, 15);
-    Serial.printf("Extracted Date: %s\n", date.c_str());
-
-    //Create CalEvent Array
-    byte eventsLength = getLength(response, '\n') - 1;
-    Serial.printf("Number Events: %u\n", eventsLength);
-
-    // print todays events
-    int i;
-    for(i = 0; i < eventsLength; i++)
+    if (millis() - lastScriptCall > updateInterval)
     {
-      calEvent temp = calEvent(getValue(response,'\n',i+1));
-      Serial.println(temp.stringify());
+      String response = FetchGCal(script);
+      Serial.printf("Today's Calendar:\n%s\n", response.c_str());
+
+      //Extract current date
+      String date = getValue(response, '\n', 0);
+      date = date.substring(0, 15);
+      Serial.printf("Extracted Date: %s\n", date.c_str());
+
+      //Create CalEvent Array
+      byte eventsLength = getLength(response, '\n') - 1;
+      Serial.printf("Number Events: %u\n", eventsLength);
+
+      // print todays events
+      int i;
+      for (i = 0; i < eventsLength; i++)
+      {
+        calEvent temp = calEvent(getValue(response, '\n', i + 1));
+        Serial.println(temp.stringify());
+      }
+
+      lastScriptCall = millis();
     }
   }
 }
