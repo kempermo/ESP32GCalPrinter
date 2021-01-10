@@ -140,7 +140,9 @@ String WebFetch(String url)
   //Serial.print("GCAL:server:");
   //Serial.println(server);
   if (!client.connect(server, 443))
+  {
     //Serial.println("GCAL:No connection");
+  }
   else
   {
     //Serial.println("GCAL:Connect");
