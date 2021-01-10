@@ -53,20 +53,20 @@ void setup()
   // start the wifi
   WiFi.mode(WIFI_STA);
   WiFi.disconnect();
-  Serial.print("Connecting to WiFi.");
+  //Serial.print("Connecting to WiFi.");
   WiFi.begin(ssid, pass);
 
   // wait for the wifi to connect
   while (WiFi.status() != WL_CONNECTED) {
-    Serial.print(".");
+    //Serial.print(".");
     delay(300);
   }
 
   // print some debug information about the wifi connection
-  Serial.println("");
-  Serial.println("WiFi connected");
-  Serial.println("IP address: ");
-  Serial.println(WiFi.localIP());
+  //Serial.println("");
+  //Serial.println("WiFi connected");
+  //Serial.println("IP address: ");
+  //Serial.println(WiFi.localIP());
 
   // reset timer
   lastScriptCall = millis() - updateInterval;
@@ -79,16 +79,16 @@ void loop()
     if (millis() - lastScriptCall > updateInterval)
     {
       String response = FetchGCal(script);
-      Serial.printf("Today's Calendar:\n%s\n", response.c_str());
+      //Serial.printf("Today's Calendar:\n%s\n", response.c_str());
 
       //Extract current date
       String date = getValue(response, '\n', 0);
       date = date.substring(0, 15);
-      Serial.printf("Extracted Date: %s\n", date.c_str());
+      //Serial.printf("Extracted Date: %s\n", date.c_str());
 
       //Create CalEvent Array
       byte eventsLength = getLength(response, '\n') - 1;
-      Serial.printf("Number Events: %u\n", eventsLength);
+      //Serial.printf("Number Events: %u\n", eventsLength);
 
       // print todays events
       int i;
@@ -96,6 +96,7 @@ void loop()
       {
         calEvent temp = calEvent(getValue(response, '\n', i + 1));
         Serial.println(temp.stringify());
+        delay(5000);
       }
 
       lastScriptCall = millis();
@@ -121,8 +122,8 @@ String WebFetch(String url)
   bool Redirect = 0;
 
   strURL = url.c_str();
-  Serial.print("GCAL:URL:");
-  Serial.println(strURL);
+  //Serial.print("GCAL:URL:");
+  //Serial.println(strURL);
 
   if (memcmp("https://", strURL, 8) == 0)
   {
@@ -136,13 +137,13 @@ String WebFetch(String url)
     server[i] = 0;
   }
 
-  Serial.print("GCAL:server:");
-  Serial.println(server);
+  //Serial.print("GCAL:server:");
+  //Serial.println(server);
   if (!client.connect(server, 443))
-    Serial.println("GCAL:No connection");
+    //Serial.println("GCAL:No connection");
   else
   {
-    Serial.println("GCAL:Connect");
+    //Serial.println("GCAL:Connect");
     // Make a HTTP request:
     client.print("GET ");
     client.print(url);
@@ -162,14 +163,14 @@ String WebFetch(String url)
       {
         Redirect = 1;
         Response = line.substring(line.indexOf("http"));
-        Serial.print("GCAL:REDIRECT:");
-        Serial.println(Response);
+        //Serial.print("GCAL:REDIRECT:");
+        //Serial.println(Response);
       }
       if (line == "\r")
         break;
     }
-    Serial.print("GCAL:HEADER:");
-    Serial.println(header);
+    //Serial.print("GCAL:HEADER:");
+    //Serial.println(header);
 
     String body;
     while (client.available())
@@ -182,8 +183,8 @@ String WebFetch(String url)
 
     if (!Redirect)
     {
-      Serial.print("GCAL:BODY:");
-      Serial.println(body);
+      //Serial.print("GCAL:BODY:");
+      //Serial.println(body);
       Response = body;
     }
 
