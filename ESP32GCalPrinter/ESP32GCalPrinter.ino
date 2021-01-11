@@ -35,7 +35,7 @@ const char pass[] = "XXX"; // put your wifi password here
 
 #ifndef URLS
 #define NETWORK_LIST_LENGTH 3
-const char* script = "https://script.google.com/macros/s/A1B2C3D4/exec";
+const char* script = "https://script.google.com/macros/s/AKfycbz8loAcfXknmPR3IWEwDQWFSnvx8TKHggYoz1sSkr1Qh1M1aD02N1IA/exec";
 #else
 const char* script = SCRIPT_URL;
 #endif
@@ -95,7 +95,8 @@ void loop()
       for (i = 0; i < eventsLength; i++)
       {
         calEvent temp = calEvent(getValue(response, '\n', i + 1));
-        Serial.println(temp.stringify());
+        String nameOfEntry = temp.startTime.substring(0,5) + "-" + temp.endTime.substring(0,5) + " " + temp.name;
+        Serial.println(nameOfEntry);
         delay(5000);
       }
 
