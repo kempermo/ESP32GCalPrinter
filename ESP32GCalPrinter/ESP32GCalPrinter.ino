@@ -97,6 +97,9 @@ void loop()
         calEvent temp = calEvent(getValue(response, '\n', i + 1));
         String nameOfEntry = temp.startTime.substring(0,5) + "-" + temp.endTime.substring(0,5) + " " + temp.name;
         Serial.println(nameOfEntry);
+        Serial2.begin(9600);
+        Serial2.println(nameOfEntry);
+        Serial2.end();
         delay(5000);
       }
 
